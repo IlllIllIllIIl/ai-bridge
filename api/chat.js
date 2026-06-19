@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
   const body = req.method === "POST" ? req.body : req.query;
   const message = body?.message || "";
-  const systemPrompt = body?.system || "You are a helpful assistant. Be concise and friendly.";
+  const systemPrompt = body?.system || "You are a helpful assistant embedded in a Roblox exploit script called Hyperion. Answer questions concisely and helpfully.";
   const history = Array.isArray(body?.messages) ? body.messages : [];
 
   const BASE = "https://hermes.ai.unturf.com";
@@ -29,7 +29,7 @@ export default async function handler(req, res) {
   const response = await fetch(BASE + "/v1/chat/completions", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model, messages, temperature: 0.7, max_tokens: 300 })
+    body: JSON.stringify({ model, messages, temperature: 0.7, max_tokens: 500 })
   });
 
   if (!response.ok) {
@@ -38,6 +38,7 @@ export default async function handler(req, res) {
   }
 
   const data = await response.json();
-  const reply = data.choices?.[0]?.message?.content || "[No response]";
+  let reply = data.choices?.[0]?.message?.content || "[No response]";
+  reply = reply.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
   return res.status(200).json({ reply });
 }
