@@ -10,16 +10,26 @@ export default async function handler(req, res) {
   const systemPrompt = body?.system || "You are a helpful assistant. Be concise and friendly.";
   const history = Array.isArray(body?.messages) ? body.messages : [];
 
+  const BASE = "https://hermes.ai.unturf.com";
+
+  const modelsRes = await fetch(BASE + "/v1/models").catch(() => null);
+  let model = "gpt-3.5-turbo";
+  if (modelsRes && modelsRes.ok) {
+    const modelsData = await modelsRes.json().catch(() => null);
+    const first = modelsData?.data?.[0]?.id;
+    if (first) model = first;
+  }
+
   const messages = [
     { role: "system", content: systemPrompt },
     ...history.slice(-18),
     { role: "user", content: message }
   ];
 
-  const response = await fetch("https://hermes.ai.unturf.com/v1/chat/completions", {
+  const response = await fetch(BASE + "/v1/chat/completions", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model: "Hermes", messages, temperature: 0.7, max_tokens: 300 })
+    body: JSON.stringify({ model, messages, temperature: 0.7, max_tokens: 300 })
   });
 
   if (!response.ok) {
