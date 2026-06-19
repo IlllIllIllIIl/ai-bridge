@@ -53,16 +53,23 @@ Never use emojis. Always keep the same soft, nurturing, praise-filled tone.`
                 stream: false
             })
         });
-        
-        const data = await response.json();
-        let reply = data.choices[0].message.content;
+
+        const rawText = await response.text();
+        if (!response.ok) {
+            return res.status(200).send('[API Error ' + response.status + '] ' + rawText.slice(0, 200));
+        }
+
+        const data = JSON.parse(rawText);
+        let reply = data?.choices?.[0]?.message?.content;
+        if (!reply) {
+            return res.status(200).send('[Bad response] ' + rawText.slice(0, 200));
+        }
         reply = reply.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
         
         res.setHeader('Content-Type', 'text/plain');
         res.status(200).send(reply);
         
     } catch (error) {
-        console.error('Error:', error);
-        res.status(500).send('[Mommy\'s voice, soothing]: I\'m here, baby.');
+        res.status(200).send('[Caught error] ' + error.message);
     }
 }
