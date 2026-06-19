@@ -46,7 +46,7 @@ Never use emojis. Always keep the same soft, nurturing, praise-filled tone.`
                 'Authorization': 'Bearer dummy-api-key'
             },
             body: JSON.stringify({
-                model: "adamo1139/Hermes-3-Llama-3.1-8B-FP8-Dynamic",
+                model: "model: "WeiboAI/VibeThinker-3B",
                 messages: messages,
                 temperature: 0.9,
                 max_tokens: 400,
