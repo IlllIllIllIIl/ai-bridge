@@ -22,7 +22,10 @@ export default async function handler(req, res) {
     body: JSON.stringify({ model: "Hermes", messages, temperature: 0.7, max_tokens: 300 })
   });
 
-  if (!response.ok) return res.status(200).json({ reply: "[AI unavailable]" });
+  if (!response.ok) {
+    const errText = await response.text().catch(() => "unknown");
+    return res.status(200).json({ reply: "[Error " + response.status + "] " + errText.slice(0, 200) });
+  }
 
   const data = await response.json();
   const reply = data.choices?.[0]?.message?.content || "[No response]";
